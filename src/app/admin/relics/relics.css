@@ -1,0 +1,15 @@
+.list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.list-heading h1 {
+  margin-bottom: 8px;
+}
+@media (max-width: 600px) {
+  .list-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

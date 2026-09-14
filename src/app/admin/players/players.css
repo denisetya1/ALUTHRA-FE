@@ -1,0 +1,28 @@
+.quest-filters select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+.quest-filters select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.player-status {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: var(--primary-soft);
+  color: var(--primary-soft-foreground);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.player-status-suspended { background: #fff4e5; color: #9a6700; }
+.player-status-banned { background: #feeceb; color: #b42318; }
+:root[data-theme="dark"] .player-status-suspended { background: #3d2d12; color: #f7c66a; }
+:root[data-theme="dark"] .player-status-banned { background: #482321; color: #fda29b; }

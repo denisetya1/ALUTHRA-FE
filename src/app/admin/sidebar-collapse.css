@@ -1,0 +1,17 @@
+.sidebar-heading{position:relative}
+.sidebar-collapse{position:absolute;right:-33px;top:0;padding:3px;width:27px;height:27px;z-index:2;font-size:20px;line-height:18px}
+.expand-label{display:none}
+.sidebar nav a .menu-label{font-size:13px;width:auto;text-align:left}
+@media(min-width:801px){
+  html[data-sidebar=collapsed] .sidebar{width:68px;padding-left:8px;padding-right:8px}
+  html[data-sidebar=collapsed] .sidebar .brand{justify-content:center}
+  html[data-sidebar=collapsed] .sidebar .brand-name,
+  html[data-sidebar=collapsed] .sidebar .menu-label,
+  html[data-sidebar=collapsed] .sidebar .eyebrow,
+  html[data-sidebar=collapsed] .sidebar-footer{display:none}
+  html[data-sidebar=collapsed] .sidebar nav a{justify-content:center;padding:13px 8px;gap:0}
+  html[data-sidebar=collapsed] .sidebar-collapse{right:-25px}
+  html[data-sidebar=collapsed] .collapse-label{display:none}
+  html[data-sidebar=collapsed] .expand-label{display:inline}
+}
+@media(max-width:800px){.sidebar-collapse{display:none}}
