@@ -8,8 +8,10 @@
   html[data-sidebar=collapsed] .sidebar .brand-name,
   html[data-sidebar=collapsed] .sidebar .menu-label,
   html[data-sidebar=collapsed] .sidebar .eyebrow,
+  html[data-sidebar=collapsed] .sidebar .sidebar-group-title,
   html[data-sidebar=collapsed] .sidebar-footer{display:none}
   html[data-sidebar=collapsed] .sidebar nav a{justify-content:center;padding:13px 8px;gap:0}
+  html[data-sidebar=collapsed] .sidebar-group+.sidebar-group{margin-top:12px;padding-top:12px}
   html[data-sidebar=collapsed] .sidebar-collapse{right:-25px}
   html[data-sidebar=collapsed] .collapse-label{display:none}
   html[data-sidebar=collapsed] .expand-label{display:inline}

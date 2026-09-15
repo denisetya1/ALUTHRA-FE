@@ -1,0 +1,228 @@
+.card-filters select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+.card-filters select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.card-table .mongo-id {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.card-identity > div {
+  min-width: 0;
+}
+.card-list-thumb {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--subtle);
+  object-fit: contain;
+}
+.card-list-thumb-empty {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+.capitalize {
+  text-transform: capitalize;
+}
+.stat-max {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.rarity {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: var(--subtle);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+.rarity-1 {
+  background: #e9efff;
+  color: #3157e8;
+}
+.rarity-2 {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+.rarity-3 {
+  background: #fff4d6;
+  color: #9a6700;
+}
+:root[data-theme="dark"] .rarity-1 {
+  background: #202c53;
+  color: #8ea6ff;
+}
+:root[data-theme="dark"] .rarity-2 {
+  background: #3b2050;
+  color: #d8a7ff;
+}
+:root[data-theme="dark"] .rarity-3 {
+  background: #3d3214;
+  color: #f7cf67;
+}
+.item-editor select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+.item-editor select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.card-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.evolve-material-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.evolve-material-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.evolve-material-heading p {
+  margin: 5px 0 0;
+  font-size: 12px;
+}
+.evolve-material-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+.evolve-material-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(100px, 180px) 40px;
+  align-items: end;
+  gap: 12px;
+}
+.evolve-material-empty {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.card-options .shop-option {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+@media (max-width: 800px) {
+  .card-options {
+    grid-template-columns: 1fr;
+  }
+  .evolve-material-row {
+    grid-template-columns: minmax(0, 1fr) 110px 40px;
+  }
+}
+.rarity-4 {
+  background: #ffe8ef;
+  color: #be123c;
+}
+:root[data-theme="dark"] .rarity-4 {
+  background: #4a1f30;
+  color: #fda4af;
+}
+.evolution-image-list {
+  display: grid;
+  gap: 20px;
+}
+.evolution-image-group {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--subtle);
+}
+.evolution-image-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.evolution-image-heading span,
+.existing-image {
+  color: var(--muted);
+  font-size: 11px;
+}
+.evolution-image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.evolution-preview {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.evolution-preview img {
+  object-fit: contain;
+}
+.evolution-preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.evolution-upload {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.evolution-upload svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+.evolution-upload input {
+  height: 42px;
+  padding: 7px;
+  font-size: 11px;
+}
+@media (max-width: 650px) {
+  .evolution-image-grid {
+    grid-template-columns: 1fr;
+  }
+  .evolution-preview {
+    height: 200px;
+  }
+}

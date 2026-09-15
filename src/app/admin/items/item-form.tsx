@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { itemFormSchema, type ItemFormValues } from "./new/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
   Card,
@@ -17,6 +16,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { ArrowLeft, Loader2, Save, ImagePlus } from "lucide-react";
+import type { EffectOption } from "@/lib/admin-master-data";
 import "./new/form.css";
 
 export type ItemDefaults = Omit<ItemFormValues, "image_file"> & {
@@ -26,14 +26,15 @@ export default function ItemForm({
   mode = "create",
   itemId,
   initialValues,
+  effects,
 }: {
   mode?: "create" | "edit";
   itemId?: string;
   initialValues?: ItemDefaults;
+  effects: EffectOption[];
 }) {
   const router = useRouter();
   const {
-    control,
     register,
     handleSubmit,
     setError,
@@ -49,9 +50,6 @@ export default function ItemForm({
       desc_indonesia: "",
       effect: "",
       effect_amount: 0,
-      price: 0,
-      discount: 0,
-      shop: false,
     },
   });
   const fieldError = (name: keyof ItemFormValues) =>
@@ -74,6 +72,7 @@ export default function ItemForm({
       if (file instanceof File && file.size) {
         const upload = new FormData();
         upload.set("file", file);
+        upload.set("kind", "items");
         const uploaded = await fetch("/api/admin/uploads", {
           method: "POST",
           body: upload,
@@ -118,8 +117,8 @@ export default function ItemForm({
         <h1>{mode === "edit" ? "Edit item" : "Add item"}</h1>
         <p className="muted">
           {mode === "edit"
-            ? "Update this item and its shop configuration."
-            : "Create an item for your world. You can configure its effect and shop availability below."}
+            ? "Update this item and its gameplay effect."
+            : "Create an item for your world. Shop pricing is configured separately in the Shop menu."}
         </p>
       </div>
       <form className="item-form" noValidate onSubmit={handleSubmit(submit)}>
@@ -199,72 +198,35 @@ export default function ItemForm({
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Effect & pricing</CardTitle>
+              <CardTitle>Item effect</CardTitle>
               <CardDescription>
-                Set the gameplay effect and the values used in the shop.
+                Set the gameplay effect applied by this item.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="item-fields">
                 <div className="editor-field">
                   <Label htmlFor="effect">Effect *</Label>
-                  <Input
+                  <select
                     id="effect"
                     {...register("effect")}
                     {...accessibility("effect")}
-                    placeholder="Effect key from game configuration"
-                  />
+                  >
+                    <option value="">Select item effect</option>
+                    {effects.map((effect) => (
+                      <option key={effect._id} value={effect.name}>
+                        {effect.description} ({effect.name})
+                      </option>
+                    ))}
+                  </select>
                   {fieldError("effect")}
                 </div>
-                {(["effect_amount", "price", "discount"] as const).map(
-                  (name) => (
-                    <div key={name} className="editor-field">
-                      <Label htmlFor={name}>
-                        {name === "effect_amount"
-                          ? "Effect amount"
-                          : name === "price"
-                            ? "Price"
-                            : "Discount"}{" "}
-                        *
-                      </Label>
-                      <Input
-                        id={name}
-                        {...register(name, { valueAsNumber: true })}
-                        {...accessibility(name)}
-                        type="number"
-                        min="0"
-                        step="1"
-                      />
-                      {fieldError(name)}
-                    </div>
-                  ),
-                )}
-              </div>
-              <div className="shop-option">
-                <Controller
-                  control={control}
-                  name="shop"
-                  render={({ field }) => (
-                    <Checkbox
-                      id="shop"
-                      name={field.name}
-                      ref={field.ref}
-                      checked={field.value}
-                      onCheckedChange={(value) =>
-                        field.onChange(value === true)
-                      }
-                      onBlur={field.onBlur}
-                      disabled={pending}
-                      {...accessibility("shop")}
-                    />
-                  )}
-                />
-                <div>
-                  <Label htmlFor="shop">Available in shop</Label>
-                  <p>Allow players to purchase this item from the shop.</p>
+                <div className="editor-field">
+                  <Label htmlFor="effect_amount">Effect amount *</Label>
+                  <Input id="effect_amount" {...register("effect_amount", { valueAsNumber: true })} {...accessibility("effect_amount")} type="number" min="0" step="1" />
+                  {fieldError("effect_amount")}
                 </div>
               </div>
-              {fieldError("shop")}
             </CardContent>
           </Card>
         </fieldset>

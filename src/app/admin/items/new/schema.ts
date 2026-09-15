@@ -20,9 +20,6 @@ export const itemFormSchema = z.object({
     .min(1, "Effect is required.")
     .max(100, "Maximum 100 characters."),
   effect_amount: amount,
-  price: amount,
-  discount: amount,
-  shop: z.boolean(),
   image_file: z
     .custom<FileList | undefined>(
       (value) =>

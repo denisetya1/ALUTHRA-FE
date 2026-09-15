@@ -10,13 +10,10 @@ type Item = {
   name_english?: string;
   name_indonesia?: string;
   image?: string;
-  price?: number;
-  discount?: number;
   effect?: string;
   effect_amount?: number;
   desc_english?: string;
   desc_indonesia?: string;
-  shop?: boolean;
 };
 
 export default async function Items({
@@ -27,15 +24,12 @@ export default async function Items({
   const params = await searchParams;
   const search =
     typeof params.search === "string" ? params.search.slice(0, 100) : "";
-  const shop =
-    params.shop === "true" || params.shop === "false" ? params.shop : "";
   const page = Math.floor(
     Math.max(1, Math.min(100000, Number(params.page) || 1)),
   );
   const query = new URLSearchParams({
     page: String(page),
     ...(search ? { search } : {}),
-    ...(shop ? { shop } : {}),
   });
   const token = (await cookies()).get("admin_session")?.value;
   if (!token) redirect("/login");
@@ -66,7 +60,7 @@ export default async function Items({
         <div>
           <h1>Items</h1>
           <p className="muted">
-            Browse items, prices, effects, and shop availability.
+            Browse item definitions and gameplay effects.
           </p>
         </div>
         <Button asChild>
@@ -87,22 +81,6 @@ export default async function Items({
           placeholder="Search item name…"
           defaultValue={search}
         />
-        <select
-          name="shop"
-          aria-label="Shop availability"
-          defaultValue={shop}
-          style={{
-            padding: "10px",
-            borderRadius: 6,
-            background: "var(--surface)",
-            color: "var(--text)",
-            border: "1px solid var(--line)",
-          }}
-        >
-          <option value="">All items</option>
-          <option value="true">In shop</option>
-          <option value="false">Not in shop</option>
-        </select>
         <Button type="submit" variant="outline">
           <Search />
           Search
@@ -130,12 +108,9 @@ export default async function Items({
                     "Item ID",
                     "Name",
                     "Image",
-                    "Price",
-                    "Discount",
                     "Effect",
                     "Amount",
                     "Description",
-                    "Shop",
                     "Action",
                   ].map((name) => (
                     <th key={name} scope="col">
@@ -147,8 +122,8 @@ export default async function Items({
               <tbody>
                 {result.data.length === 0 ? (
                   <tr>
-                    <td colSpan={11} className="quest-empty">
-                      {search || shop
+                    <td colSpan={8} className="quest-empty">
+                      {search
                         ? "No items match your filters."
                         : "No items yet. Item data has not been imported."}
                     </td>
@@ -167,14 +142,11 @@ export default async function Items({
                         )}
                       </td>
                       <td>{item.image || "—"}</td>
-                      <td>{item.price ?? "—"}</td>
-                      <td>{item.discount ?? "—"}</td>
                       <td>{item.effect || "—"}</td>
                       <td>{item.effect_amount ?? "—"}</td>
                       <td className="quest-name">
                         {item.desc_english || item.desc_indonesia || "—"}
                       </td>
-                      <td>{item.shop ? "Yes" : "No"}</td>
                       <td>
                         <Button size="sm" variant="outline" asChild>
                           <Link href={`/admin/items/${item._id}/edit`}>

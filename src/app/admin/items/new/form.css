@@ -159,8 +159,90 @@
   background: var(--strong);
   color: var(--inverse);
 }
+.item-editor select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+.item-editor select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.master-option-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.master-option-section > p {
+  margin: 6px 0 14px;
+  font-size: 12px;
+}
+.master-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.master-checkbox-option {
+  display: block;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.master-checkbox-option:hover {
+  background: var(--subtle);
+}
+.master-checkbox-option span {
+  display: grid;
+  gap: 3px;
+}
+.master-skill-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.master-skill-heading label {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  cursor: pointer;
+}
+.skill-unlock-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.skill-unlock-field label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.skill-unlock-field select {
+  height: 36px;
+}
+.master-checkbox-option small {
+  color: var(--muted);
+  font-weight: 400;
+}
+@media (max-width: 1000px) {
+  .master-checkbox-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 800px) {
   .item-fields {
+    grid-template-columns: 1fr;
+  }
+  .master-checkbox-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import ItemForm, { type ItemDefaults } from "../../item-form";
-import { loadEffectOptions } from "@/lib/admin-master-data";
-export default async function EditItem({
+import CardForm, { type CardDefaults } from "../../card-form";
+import { loadCardOptions } from "@/lib/admin-master-data";
+
+export default async function EditCard({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -11,22 +12,22 @@ export default async function EditItem({
   if (!/^[a-f\d]{24}$/i.test(id)) notFound();
   const token = (await cookies()).get("admin_session")?.value;
   if (!token) redirect("/login");
-  const [response, effects] = await Promise.all([
+  const [response, options] = await Promise.all([
     fetch(
-      `${process.env.API_BASE_URL || "http://127.0.0.1:3000/api/v1"}/admin/items/${id}`,
+      `${process.env.API_BASE_URL || "http://127.0.0.1:3000/api/v1"}/admin/cards/${id}`,
       { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
     ),
-    loadEffectOptions(token),
+    loadCardOptions(token),
   ]);
   if (response.status === 401) redirect("/login");
   if (response.status === 404) notFound();
-  if (!response.ok) throw new Error("Unable to load item");
+  if (!response.ok) throw new Error("Unable to load card");
   return (
-    <ItemForm
+    <CardForm
       mode="edit"
-      itemId={id}
-      initialValues={(await response.json()) as ItemDefaults}
-      effects={effects}
+      cardId={id}
+      initialValues={(await response.json()) as CardDefaults}
+      {...options}
     />
   );
 }

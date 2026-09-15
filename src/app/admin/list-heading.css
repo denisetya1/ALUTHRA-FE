@@ -1,0 +1,28 @@
+.list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+}
+.list-heading > div {
+  min-width: 0;
+}
+.list-heading h1 {
+  margin-bottom: 8px;
+}
+.list-heading > a,
+.list-heading > button {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+@media (max-width: 600px) {
+  .list-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .list-heading > a,
+  .list-heading > button {
+    margin-left: 0;
+  }
+}

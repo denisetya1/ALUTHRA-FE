@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowLeft, ImagePlus, Loader2, Save } from "lucide-react";
+import type { EffectOption } from "@/lib/admin-master-data";
 import "../items/new/form.css";
 export type RelicDefaults = Omit<RelicValues, "image_file"> & {
   image?: string;
@@ -25,10 +26,12 @@ export default function RelicForm({
   mode = "create",
   relicId,
   initialValues,
+  effects,
 }: {
   mode?: "create" | "edit";
   relicId?: string;
   initialValues?: RelicDefaults;
+  effects: EffectOption[];
 }) {
   const router = useRouter();
   const {
@@ -64,6 +67,7 @@ export default function RelicForm({
       if (file) {
         const upload = new FormData();
         upload.set("file", file);
+        upload.set("kind", "relics");
         const res = await fetch("/api/admin/uploads", {
           method: "POST",
           body: upload,
@@ -179,11 +183,14 @@ export default function RelicForm({
               <div className="item-fields">
                 <div className="editor-field">
                   <Label htmlFor="effect">Effect *</Label>
-                  <Input
-                    id="effect"
-                    placeholder="Effect key"
-                    {...register("effect")}
-                  />
+                  <select id="effect" {...register("effect")}>
+                    <option value="">Select item effect</option>
+                    {effects.map((effect) => (
+                      <option key={effect._id} value={effect.name}>
+                        {effect.description} ({effect.name})
+                      </option>
+                    ))}
+                  </select>
                   {err("effect")}
                 </div>
                 {(["effect_amount", "price", "discount"] as const).map((n) => (

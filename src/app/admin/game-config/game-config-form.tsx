@@ -10,9 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { gameConfigSchema, type GameConfigValues } from "./schema";
+import type { CardOption } from "@/lib/admin-master-data";
 import "../items/new/form.css";
 
-export default function GameConfigForm({ initialValues }: { initialValues: GameConfigValues }) {
+export default function GameConfigForm({ initialValues, cards }: { initialValues: GameConfigValues; cards: CardOption[] }) {
   const router = useRouter();
   const { control, register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<GameConfigValues>({
     resolver: zodResolver(gameConfigSchema),
@@ -53,6 +54,15 @@ export default function GameConfigForm({ initialValues }: { initialValues: GameC
                 )} />
                 <div><Label htmlFor="maintenance_mode">Maintenance mode</Label><p>Temporarily prevent players from entering the game.</p></div>
               </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle>First card by realm</CardTitle><CardDescription>The first card granted after a player chooses their realm.</CardDescription></CardHeader>
+            <CardContent className="item-fields">
+              {(["solaris", "sylvara", "umbra"] as const).map((realm) => {
+                const field = `first_cards.${realm}` as const;
+                return <div className="editor-field" key={realm}><Label htmlFor={field} className="capitalize">{realm} first card *</Label><select id={field} {...register(field)}><option value="">Select {realm} card</option>{cards.filter((card) => card.realm?.toLowerCase() === realm).map((card) => <option key={card._id} value={card._id}>{card.name || card._id}</option>)}</select>{errors.first_cards?.[realm] && <small className="error">{errors.first_cards[realm]?.message}</small>}</div>;
+              })}
             </CardContent>
           </Card>
           <Card>
