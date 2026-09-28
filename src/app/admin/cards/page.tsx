@@ -1,9 +1,10 @@
-import { cookies } from "next/headers";
+import { unstable_rethrow } from "next/navigation";
+import { adminFetch } from "@/lib/admin-session";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Pencil, Plus, Search, X } from "lucide-react";
+import { Copy, ChevronLeft, ChevronRight, Pencil, Plus, Search, X } from "lucide-react";
+import { loadRealmOptions, type RealmOption } from "@/lib/admin-master-data";
 import "../quests/quests.css";
 import "./cards.css";
 
@@ -42,16 +43,18 @@ export default async function Cards({ searchParams }: {
   const gacha = params.gacha === "true" || params.gacha === "false" ? params.gacha : "";
   const page = Math.floor(Math.max(1, Math.min(100000, Number(params.page) || 1)));
   const query = new URLSearchParams({ page: String(page), ...(search ? { search } : {}), ...(realm ? { realm } : {}), ...(rarity ? { rarity } : {}), ...(gacha ? { gacha } : {}) });
-  const token = (await cookies()).get("admin_session")?.value;
-  if (!token) redirect("/login");
   let result: { data: Card[]; total: number } | null = null;
+  let realms: RealmOption[] = [];
   try {
-    const response = await fetch(`${process.env.API_BASE_URL || "http://127.0.0.1:3000/api/v1"}/admin/cards?${query}`, {
-      headers: { Authorization: `Bearer ${token}` }, cache: "no-store", signal: AbortSignal.timeout(10000),
-    });
-    if (response.status === 401) redirect("/login");
+    const [response, realmOptions] = await Promise.all([
+      adminFetch(`/admin/cards?${query}`, {
+        cache: "no-store", signal: AbortSignal.timeout(10000),
+      }),
+      loadRealmOptions(),
+    ]);
     if (response.ok) result = await response.json();
-  } catch {}
+    realms = realmOptions;
+  } catch (error) { unstable_rethrow(error); }
 
   const pageLink = (next: number) => {
     const nextQuery = new URLSearchParams(query);
@@ -61,13 +64,16 @@ export default async function Cards({ searchParams }: {
 
   return (
     <section>
-      <p className="eyebrow">WORLD MANAGEMENT</p>
+      <p className="eyebrow">World</p>
       <div className="list-heading"><div><h1>Cards</h1><p className="muted">Browse card stats, realms, rarity, evolution, and gacha availability.</p></div><Button asChild><Link href="/admin/cards/new"><Plus />Add card</Link></Button></div>
       {params.created === "1" && <p role="status">Card saved successfully.</p>}
       {params.updated === "1" && <p role="status">Card updated successfully.</p>}
       <form className="quest-filters card-filters">
         <input name="search" aria-label="Search cards" placeholder="Search name or legacy ID…" defaultValue={search} />
-        <input name="realm" aria-label="Filter by realm" placeholder="Realm" defaultValue={realm} />
+        <select name="realm" aria-label="Filter by realm" defaultValue={realm}>
+          <option value="">All realms</option>
+          {realms.map((option) => <option key={option._id} value={option.code}>{option.name}</option>)}
+        </select>
         <select name="rarity" aria-label="Filter by rarity" defaultValue={rarity}>
           <option value="">All rarities</option><option value="0">Common</option><option value="1">Rare</option><option value="2">Epic</option><option value="3">Legendary</option><option value="4">Mythic</option>
         </select>
@@ -84,16 +90,16 @@ export default async function Cards({ searchParams }: {
           <tbody>{result.data.length ? result.data.map((card, index) => (
             <tr key={card._id}>
               <td>{(page - 1) * 20 + index + 1}</td>
-              <td>{card.images?.find((image) => image.evolution === (card.evolution ?? 1))?.thumb || card.images?.[0]?.thumb ? <Image className="card-list-thumb" src={card.images?.find((image) => image.evolution === (card.evolution ?? 1))?.thumb || card.images?.[0]?.thumb || ""} alt={`${card.name || "Card"} thumbnail`} width={52} height={52} unoptimized /> : <span className="card-list-thumb card-list-thumb-empty">—</span>}</td>
+              <td>{card.images?.find((image) => image.evolution === (card.evolution ?? 1))?.thumb || card.images?.[0]?.thumb ? <Image className="card-list-thumb" src={card.images?.find((image) => image.evolution === (card.evolution ?? 1))?.thumb || card.images?.[0]?.thumb || ""} alt={`${card.name || "Card"} thumbnail`} width={52} height={52} unoptimized /> : <span className="card-list-thumb card-list-thumb-empty">None</span>}</td>
               <td className="quest-name"><strong>{card.name || "Unnamed card"}</strong><small className="mongo-id">{card._id}</small>{card.id !== undefined && <small>Legacy ID: {card.id}</small>}</td>
-              <td className="capitalize">{card.realm || "—"}</td>
+              <td className="capitalize">{card.realm || "Not set"}</td>
               <td><span className={`rarity rarity-${card.rarity ?? 0}`}>{rarityNames[card.rarity ?? 0] || `Tier ${card.rarity}`}</span></td>
-              <td>{card.level ?? 1} / {card.level_max ?? "—"}</td><td>{card.cost ?? "—"}</td>
+              <td>{card.level ?? 1} / {card.level_max ?? "Not set"}</td><td>{card.cost ?? "Not set"}</td>
               <td>{(card.valor ?? 0).toLocaleString()}<small className="stat-max">Max {(card.valor_max ?? 0).toLocaleString()}</small></td>
               <td>{(card.fortitude ?? 0).toLocaleString()}<small className="stat-max">Max {(card.fortitude_max ?? 0).toLocaleString()}</small></td>
-              <td>{card.evolution ?? 1} / {card.evolution_max ?? "—"}</td><td>{(card.evolve_cost_crown ?? 0).toLocaleString()}</td><td>{card.evolve_materials?.length ?? 0}</td><td>{card.gacha ? "Yes" : "No"}</td><td>{(card.price ?? 0).toLocaleString()}</td><td><Button size="sm" variant="outline" asChild><Link href={`/admin/cards/${card._id}/edit`}><Pencil />Edit</Link></Button></td>
+              <td>{card.evolution ?? 1} / {card.evolution_max ?? "Not set"}</td><td>{(card.evolve_cost_crown ?? 0).toLocaleString()}</td><td>{card.evolve_materials?.length ?? 0}</td><td>{card.gacha ? "Yes" : "No"}</td><td>{(card.price ?? 0).toLocaleString()}</td><td><div className="card-row-actions"><Button size="sm" variant="outline" asChild><Link href={`/admin/cards/${card._id}/edit`}><Pencil />Edit</Link></Button><Button size="sm" variant="outline" asChild><Link href={`/admin/cards/${card._id}/duplicate`}><Copy />Duplicate</Link></Button></div></td>
             </tr>
-          )) : <tr><td colSpan={15} className="quest-empty">{search || realm || rarity || gacha ? "No cards match your filters." : "No cards yet. Card data has not been imported."}</td></tr>}</tbody>
+          )) : <tr><td colSpan={15} className="quest-empty">{search || realm || rarity || gacha ? "No cards match these filters. Reset the filters to view every card." : "No cards yet. Use Add card to create the first card."}</td></tr>}</tbody>
         </table></div>
         <footer className="quest-pagination"><span>Page {page} · {result.total} results</span><div>
           {page > 1 && <Button size="sm" variant="outline" asChild><Link href={pageLink(page - 1)}><ChevronLeft />Previous</Link></Button>}

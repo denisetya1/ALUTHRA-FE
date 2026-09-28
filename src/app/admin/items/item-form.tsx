@@ -16,7 +16,9 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { ArrowLeft, Loader2, Save, ImagePlus } from "lucide-react";
+import { toast } from "react-toastify";
 import type { EffectOption } from "@/lib/admin-master-data";
+import { useManagedMutation } from "@/lib/react-query";
 import "./new/form.css";
 
 export type ItemDefaults = Omit<ItemFormValues, "image_file"> & {
@@ -34,6 +36,7 @@ export default function ItemForm({
   effects: EffectOption[];
 }) {
   const router = useRouter();
+  const saveItem = useManagedMutation([["items"]]);
   const {
     register,
     handleSubmit,
@@ -62,12 +65,16 @@ export default function ItemForm({
     "aria-invalid": !!errors[name],
     "aria-describedby": errors[name] ? name + "-error" : undefined,
   });
-  const fail = (message: string) => setError("root", { message });
+  const fail = (message: string) => {
+    setError("root", { message });
+    toast.error(message);
+  };
   async function submit(values: ItemFormValues) {
-    clearErrors("root");
-    const { image_file, ...body } = values;
-    const file = image_file?.[0];
-    try {
+    await saveItem.mutateAsync(async () => {
+      clearErrors("root");
+      const { image_file, ...body } = values;
+      const file = image_file?.[0];
+      try {
       let image = initialValues?.image ?? "";
       if (file instanceof File && file.size) {
         const upload = new FormData();
@@ -97,14 +104,17 @@ export default function ItemForm({
         fail(result.message);
         return;
       }
+      toast.success(mode === "edit" ? "Item updated successfully." : "Item created successfully.");
       router.push(`/admin/items?${mode === "edit" ? "updated" : "created"}=1`);
       router.refresh();
-    } catch {
-      fail(
-        "Unable to save. Check your connection and the Items list before retrying.",
-      );
-    }
+      } catch {
+        fail(
+          "Unable to save. Check your connection and the Items list before retrying.",
+        );
+      }
+    });
   }
+  const isPending = pending || saveItem.isPending;
   return (
     <section className="item-editor">
       <Button variant="ghost" size="sm" asChild>
@@ -121,8 +131,8 @@ export default function ItemForm({
             : "Create an item for your world. Shop pricing is configured separately in the Shop menu."}
         </p>
       </div>
-      <form className="item-form" noValidate onSubmit={handleSubmit(submit)}>
-        <fieldset disabled={pending} className="editor-fieldset">
+      <form className="item-form" noValidate onSubmit={handleSubmit(submit, () => toast.error("Please correct the highlighted item fields."))}>
+        <fieldset disabled={isPending} className="editor-fieldset">
           <Card>
             <CardHeader>
               <CardTitle>Item details</CardTitle>
@@ -243,10 +253,10 @@ export default function ItemForm({
             type="submit"
             size="lg"
             className="form-save-button"
-            disabled={pending}
+            disabled={isPending}
           >
-            {pending ? <Loader2 className="animate-spin" /> : <Save />}
-            {pending
+            {isPending ? <Loader2 className="animate-spin" /> : <Save />}
+            {isPending
               ? "Saving…"
               : mode === "edit"
                 ? "Update item"

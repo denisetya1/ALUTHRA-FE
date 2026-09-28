@@ -17,7 +17,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowLeft, ImagePlus, Loader2, Save } from "lucide-react";
+import { toast } from "react-toastify";
 import type { EffectOption } from "@/lib/admin-master-data";
+import { useManagedMutation } from "@/lib/react-query";
 import "../items/new/form.css";
 export type RelicDefaults = Omit<RelicValues, "image_file"> & {
   image?: string;
@@ -34,6 +36,7 @@ export default function RelicForm({
   effects: EffectOption[];
 }) {
   const router = useRouter();
+  const saveRelic = useManagedMutation([["relics"]]);
   const {
     control,
     register,
@@ -58,10 +61,15 @@ export default function RelicForm({
   });
   const err = (n: keyof RelicValues) =>
     errors[n] && <small className="error">{errors[n]?.message}</small>;
+  const fail = (message: string) => {
+    setError("root", { message });
+    toast.error(message);
+  };
   async function submit(values: RelicValues) {
-    clearErrors("root");
-    const { image_file, ...body } = values;
-    try {
+    await saveRelic.mutateAsync(async () => {
+      clearErrors("root");
+      const { image_file, ...body } = values;
+      try {
       let image = initialValues?.image ?? "";
       const file = image_file?.[0];
       if (file) {
@@ -74,7 +82,7 @@ export default function RelicForm({
         });
         const json = await res.json();
         if (!res.ok) {
-          setError("root", { message: json.message });
+          fail(json.message || "Unable to upload relic image.");
           return;
         }
         image = json.url;
@@ -89,14 +97,16 @@ export default function RelicForm({
       );
       const json = await res.json();
       if (!res.ok) {
-        setError("root", { message: json.message });
+        fail(json.message || "Unable to save relic.");
         return;
       }
+      toast.success(mode === "edit" ? "Relic updated successfully." : "Relic created successfully.");
       router.push(`/admin/relics?${mode === "edit" ? "updated" : "created"}=1`);
       router.refresh();
-    } catch {
-      setError("root", { message: "Unable to save relic." });
-    }
+      } catch {
+        fail("Unable to save relic.");
+      }
+    });
   }
   return (
     <section className="item-editor">
@@ -114,7 +124,7 @@ export default function RelicForm({
             : "Create a relic and configure its gameplay effect."}
         </p>
       </div>
-      <form className="item-form" noValidate onSubmit={handleSubmit(submit)}>
+      <form className="item-form" noValidate onSubmit={handleSubmit(submit, () => toast.error("Please correct the highlighted relic fields."))}>
         <fieldset disabled={isSubmitting} className="editor-fieldset">
           <Card>
             <CardHeader>

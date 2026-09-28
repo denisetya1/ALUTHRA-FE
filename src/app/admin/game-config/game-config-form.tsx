@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Loader2, Save } from "lucide-react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,15 +12,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { gameConfigSchema, type GameConfigValues } from "./schema";
 import type { CardOption } from "@/lib/admin-master-data";
+import { useManagedMutation } from "@/lib/react-query";
 import "../items/new/form.css";
+
+const STARTING_STAT_FIELDS = [
+  ["level", "Level"], ["experience", "EXP"], ["experience_next", "EXP to next level"],
+  ["stamina", "CP / Stamina active"], ["stamina_max", "CP / Stamina max"],
+  ["valor", "Valor"], ["valor_max", "Valor max"],
+  ["fortitude", "Fortitude"], ["fortitude_max", "Fortitude max"],
+  ["crown", "Crown"], ["aether", "Aether"], ["honor", "Honor"], ["honor_max", "Honor max"],
+  ["attribute_point", "Attribute Point"], ["allies", "Allies"], ["allies_max", "Allies max"],
+  ["cards", "Card capacity used"], ["cards_max", "Card capacity max"],
+  ["total_win", "Total wins"], ["total_lose", "Total losses"],
+  ["charge_meter", "Charge Meter"], ["event_point", "Event Point"],
+] as const;
 
 export default function GameConfigForm({ initialValues, cards }: { initialValues: GameConfigValues; cards: CardOption[] }) {
   const router = useRouter();
+  const saveConfig = useManagedMutation([["game-config"]]);
   const { control, register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<GameConfigValues>({
     resolver: zodResolver(gameConfigSchema),
     defaultValues: initialValues,
   });
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmit = handleSubmit((values) => saveConfig.mutateAsync(async () => {
     try {
       const response = await fetch("/api/admin/game-config", {
         method: "PUT",
@@ -28,23 +43,30 @@ export default function GameConfigForm({ initialValues, cards }: { initialValues
       });
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
-        setError("root", { message: payload?.message || "Unable to save game config." });
+        const message = payload?.message || "Unable to save game config.";
+        setError("root", { message });
+        toast.error(message);
         return;
       }
+      toast.success("Game config saved successfully.");
       router.push("/admin/game-config?saved=1");
       router.refresh();
     } catch {
-      setError("root", { message: "Unable to reach the server." });
+      const message = "Unable to reach the server.";
+      setError("root", { message });
+      toast.error(message);
     }
-  });
+  }), () => toast.error("Please correct the highlighted config fields."));
+
+  const pending = isSubmitting || saveConfig.isPending;
 
   return (
     <section className="item-editor">
-      <p className="eyebrow">SYSTEM SETTINGS</p>
+      <p className="eyebrow">Game settings</p>
       <h1>Game config</h1>
       <p className="muted">Global values used when players enter ALUTHRA.</p>
       <form onSubmit={onSubmit}>
-        <fieldset disabled={isSubmitting}>
+        <fieldset disabled={pending}>
           <Card>
             <CardHeader><CardTitle>Availability</CardTitle><CardDescription>Control whether players can access the game.</CardDescription></CardHeader>
             <CardContent>
@@ -80,15 +102,18 @@ export default function GameConfigForm({ initialValues, cards }: { initialValues
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle>Starting currency</CardTitle><CardDescription>Currency granted to every new player account.</CardDescription></CardHeader>
+            <CardHeader><CardTitle>Starting player stats</CardTitle><CardDescription>Stats assigned automatically to every newly registered player.</CardDescription></CardHeader>
             <CardContent className="item-fields">
-              <div><Label htmlFor="start_crown">Starting Crown</Label><Input id="start_crown" type="number" min="0" step="1" {...register("start_crown", { valueAsNumber: true })} /><p className="muted">Crown is the game&apos;s gold currency.</p>{errors.start_crown && <p className="error">{errors.start_crown.message}</p>}</div>
-              <div><Label htmlFor="start_aether">Starting Aether</Label><Input id="start_aether" type="number" min="0" step="1" {...register("start_aether", { valueAsNumber: true })} /><p className="muted">Aether is the game&apos;s diamond currency.</p>{errors.start_aether && <p className="error">{errors.start_aether.message}</p>}</div>
+              {STARTING_STAT_FIELDS.map(([key, label]) => {
+                const field = `starting_player_stats.${key}` as const;
+                const error = errors.starting_player_stats?.[key];
+                return <div className="editor-field" key={key}><Label htmlFor={field}>{label}</Label><Input id={field} type="number" min={key === "level" || key === "experience_next" ? 1 : 0} step="1" {...register(field, { valueAsNumber: true })}/>{error && <small className="error">{error.message}</small>}</div>;
+              })}
             </CardContent>
           </Card>
         </fieldset>
         {errors.root && <p className="error" role="alert">{errors.root.message}</p>}
-        <div className="item-form-actions"><Button type="submit" size="lg" className="form-save-button" disabled={isSubmitting}>{isSubmitting ? <Loader2 className="animate-spin" /> : <Save />}{isSubmitting ? "Saving…" : "Save config"}</Button></div>
+        <div className="item-form-actions"><Button type="submit" size="lg" className="form-save-button" disabled={pending}>{pending ? <Loader2 className="animate-spin" /> : <Save />}{pending ? "Saving…" : "Save config"}</Button></div>
       </form>
     </section>
   );

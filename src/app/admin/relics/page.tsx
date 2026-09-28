@@ -1,6 +1,6 @@
-import { cookies } from "next/headers";
+import { unstable_rethrow } from "next/navigation";
+import { adminFetch } from "@/lib/admin-session";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Pencil, Plus } from "lucide-react";
 import "../quests/quests.css";
@@ -30,20 +30,17 @@ export default async function Relics({
     page: String(page),
     ...(search ? { search } : {}),
   });
-  const token = (await cookies()).get("admin_session")?.value;
-  if (!token) redirect("/login");
   let result: { data: Relic[]; total: number } | null = null;
   try {
-    const response = await fetch(
-      `${process.env.API_BASE_URL || "http://127.0.0.1:3000/api/v1"}/admin/relics?${query}`,
-      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+    const response = await adminFetch(
+      `/admin/relics?${query}`,
+      { cache: "no-store" },
     );
-    if (response.status === 401) redirect("/login");
     if (response.ok) result = await response.json();
-  } catch {}
+  } catch (error) { unstable_rethrow(error); }
   return (
     <section>
-      <p className="eyebrow">WORLD MANAGEMENT</p>
+      <p className="eyebrow">World</p>
       <div className="list-heading">
         <div>
           <h1>Relics</h1>
@@ -105,12 +102,12 @@ export default async function Relics({
                         <strong>{r.name_english}</strong>
                         {r.name_indonesia && <small>{r.name_indonesia}</small>}
                       </td>
-                      <td>{r.image || "—"}</td>
+                      <td>{r.image || "None"}</td>
                       <td>{r.effect}</td>
                       <td>{r.effect_amount}</td>
                       <td>{r.price}</td>
                       <td>{r.discount}</td>
-                      <td className="quest-name">{r.desc_english || "—"}</td>
+                      <td className="quest-name">{r.desc_english || "Not set"}</td>
                       <td>{r.shop ? "Yes" : "No"}</td>
                       <td>
                         <Button size="sm" variant="outline" asChild>
@@ -125,7 +122,7 @@ export default async function Relics({
                 ) : (
                   <tr>
                     <td colSpan={10} className="quest-empty">
-                      No relics yet.
+                      No relics yet. Use Add relic to create the first one.
                     </td>
                   </tr>
                 )}

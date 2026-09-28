@@ -6,6 +6,48 @@
   font-size: 11px;
   font-weight: 600;
 }
+.region-actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+.region-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.region-breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.region-breadcrumb a:hover {
+  text-decoration: underline;
+}
+.region-breadcrumb svg {
+  width: 14px;
+  height: 14px;
+}
+.region-breadcrumb [aria-current="page"] {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.region-thumbnail {
+  width: 64px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--subtle);
+}
+.region-image-preview {
+  width: min(100%, 520px);
+  max-height: 260px;
+  border-radius: 12px;
+  object-fit: cover;
+}
 .region-visible {
   background: var(--primary-soft);
   color: var(--primary);

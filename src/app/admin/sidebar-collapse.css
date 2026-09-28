@@ -1,7 +1,8 @@
 .sidebar-heading{position:relative}
-.sidebar-collapse{position:absolute;right:-33px;top:0;padding:3px;width:27px;height:27px;z-index:2;font-size:20px;line-height:18px}
+.sidebar-collapse{position:absolute;right:-33px;top:0;padding:3px;width:27px;height:27px;z-index:2;font-size:20px;line-height:18px}.sidebar-collapse svg{width:16px;height:16px}
 .expand-label{display:none}
 .sidebar nav a .menu-label{font-size:13px;width:auto;text-align:left}
+.sidebar nav a .coming-soon{display:block;margin-top:2px;color:var(--muted);font-size:9px;font-weight:500;line-height:1.1}
 @media(min-width:801px){
   html[data-sidebar=collapsed] .sidebar{width:68px;padding-left:8px;padding-right:8px}
   html[data-sidebar=collapsed] .sidebar .brand{justify-content:center}

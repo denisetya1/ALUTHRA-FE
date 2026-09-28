@@ -1,5 +1,5 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { unstable_rethrow } from "next/navigation";
+import { adminFetch } from "@/lib/admin-session";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Pencil, Plus, Search, X } from "lucide-react";
@@ -31,23 +31,17 @@ export default async function Items({
     page: String(page),
     ...(search ? { search } : {}),
   });
-  const token = (await cookies()).get("admin_session")?.value;
-  if (!token) redirect("/login");
   let result: { data: Item[]; total: number } | null = null;
-  let unauthorized = false;
   try {
-    const response = await fetch(
-      `${process.env.API_BASE_URL || "http://127.0.0.1:3000/api/v1"}/admin/items?${query}`,
+    const response = await adminFetch(
+      `/admin/items?${query}`,
       {
-        headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
         signal: AbortSignal.timeout(10000),
       },
     );
-    unauthorized = response.status === 401;
     if (response.ok) result = await response.json();
-  } catch {}
-  if (unauthorized) redirect("/login");
+  } catch (error) { unstable_rethrow(error); }
   const pageLink = (next: number) => {
     const q = new URLSearchParams(query);
     q.set("page", String(next));
@@ -55,7 +49,7 @@ export default async function Items({
   };
   return (
     <section>
-      <p className="eyebrow">WORLD MANAGEMENT</p>
+      <p className="eyebrow">World</p>
       <div className="list-heading">
         <div>
           <h1>Items</h1>
@@ -125,7 +119,7 @@ export default async function Items({
                     <td colSpan={8} className="quest-empty">
                       {search
                         ? "No items match your filters."
-                        : "No items yet. Item data has not been imported."}
+                        : "No items yet. Use Add item to create the first item."}
                     </td>
                   </tr>
                 ) : (
@@ -135,17 +129,17 @@ export default async function Items({
                       <td>{item._id}</td>
                       <td className="quest-name">
                         <strong>
-                          {item.name_english || item.name_indonesia || "—"}
+                          {item.name_english || item.name_indonesia || "Not set"}
                         </strong>
                         {item.name_english && item.name_indonesia && (
                           <small>{item.name_indonesia}</small>
                         )}
                       </td>
-                      <td>{item.image || "—"}</td>
-                      <td>{item.effect || "—"}</td>
-                      <td>{item.effect_amount ?? "—"}</td>
+                      <td>{item.image || "None"}</td>
+                      <td>{item.effect || "Not set"}</td>
+                      <td>{item.effect_amount ?? "Not set"}</td>
                       <td className="quest-name">
-                        {item.desc_english || item.desc_indonesia || "—"}
+                        {item.desc_english || item.desc_indonesia || "Not set"}
                       </td>
                       <td>
                         <Button size="sm" variant="outline" asChild>

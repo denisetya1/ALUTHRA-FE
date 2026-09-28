@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 import { ArrowLeft, ImagePlus, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +27,7 @@ import type {
   SkillOption,
   ItemOption,
 } from "@/lib/admin-master-data";
+import { useManagedMutation } from "@/lib/react-query";
 import "../items/new/form.css";
 import "./cards.css";
 
@@ -130,7 +132,7 @@ export default function CardForm({
   skills,
   items,
 }: {
-  mode?: "create" | "edit";
+  mode?: "create" | "edit" | "duplicate";
   cardId?: string;
   initialValues?: CardDefaults;
   realms: RealmOption[];
@@ -139,6 +141,7 @@ export default function CardForm({
   items: ItemOption[];
 }) {
   const router = useRouter();
+  const saveCard = useManagedMutation([["cards"]]);
   const {
     control,
     register,
@@ -205,9 +208,10 @@ export default function CardForm({
   );
 
   async function submit(values: CardValues) {
-    clearErrors("root");
-    const { evolution_images, ...body } = values;
-    try {
+    await saveCard.mutateAsync(async () => {
+      clearErrors("root");
+      const { evolution_images, ...body } = values;
+      try {
       const uploadFile = async (
         file: File,
         variant: ImageVariant,
@@ -266,17 +270,20 @@ export default function CardForm({
       );
       const payload = await response.json();
       if (!response.ok) {
-        setError("root", { message: payload.message });
+        const message = payload.message || "Unable to save card.";
+        setError("root", { message });
+        toast.error(message);
         return;
       }
+      toast.success(mode === "edit" ? "Card updated successfully." : "Card created successfully.");
       router.push(`/admin/cards?${mode === "edit" ? "updated" : "created"}=1`);
       router.refresh();
-    } catch (cause) {
-      setError("root", {
-        message:
-          cause instanceof Error ? cause.message : "Unable to save card.",
-      });
-    }
+      } catch (cause) {
+        const message = cause instanceof Error ? cause.message : "Unable to save card.";
+        setError("root", { message });
+        toast.error(message);
+      }
+    });
   }
 
   return (
@@ -288,12 +295,20 @@ export default function CardForm({
         </Link>
       </Button>
       <div className="editor-heading">
-        <h1>{mode === "edit" ? "Edit card" : "Add card"}</h1>
+        <h1>
+          {mode === "edit"
+            ? "Edit card"
+            : mode === "duplicate"
+              ? "Duplicate card"
+              : "Add card"}
+        </h1>
         <p className="muted">
-          Configure identity, artwork, progression, and battle stats.
+          {mode === "duplicate"
+            ? "Review and edit the copied card data before saving it as a new card."
+            : "Configure identity, artwork, progression, and battle stats."}
         </p>
       </div>
-      <form className="item-form" noValidate onSubmit={handleSubmit(submit)}>
+      <form className="item-form" noValidate onSubmit={handleSubmit(submit, () => toast.error("Please correct the highlighted card fields."))}>
         <fieldset disabled={isSubmitting} className="editor-fieldset">
           <Card>
             <CardHeader>

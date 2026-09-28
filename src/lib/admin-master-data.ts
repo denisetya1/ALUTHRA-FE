@@ -1,3 +1,5 @@
+import { adminFetch } from "@/lib/admin-session";
+
 export type RealmOption = {
   _id: string;
   code: string;
@@ -32,12 +34,8 @@ export type ItemOption = {
 export type CardOption = { _id: string; name?: string; realm?: string; rarity?: number };
 export type PlayerOption = { _id: string; username?: string; email: string };
 
-const baseUrl = process.env.API_BASE_URL || "http://127.0.0.1:3000/api/v1";
-
-async function load<T>(path: string, token: string): Promise<T[]> {
-  const response = await fetch(`${baseUrl}/admin/${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: "no-store",
+async function load<T>(path: string): Promise<T[]> {
+  const response = await adminFetch(`/admin/${path}`, {
     signal: AbortSignal.timeout(10000),
   });
   if (!response.ok) throw new Error(`Unable to load ${path}`);
@@ -45,12 +43,12 @@ async function load<T>(path: string, token: string): Promise<T[]> {
   return result.data;
 }
 
-export async function loadCardOptions(token: string) {
+export async function loadCardOptions() {
   const [realms, rarities, skills, items] = await Promise.all([
-    load<RealmOption>("realms", token),
-    load<RarityOption>("rarities", token),
-    load<SkillOption>("card-skills", token),
-    load<ItemOption>("items/options", token),
+    load<RealmOption>("realms"),
+    load<RarityOption>("rarities"),
+    load<SkillOption>("card-skills"),
+    load<ItemOption>("items/options"),
   ]);
   return {
     realms: realms.filter((option) => option.is_active),
@@ -60,21 +58,27 @@ export async function loadCardOptions(token: string) {
   };
 }
 
-export async function loadEffectOptions(token: string) {
-  return (await load<EffectOption>("item-effects", token)).filter(
+export async function loadRealmOptions() {
+  return (await load<RealmOption>("realms")).filter(
     (option) => option.is_active,
   );
 }
 
-export async function loadItemOptions(token: string) {
-  return load<ItemOption>("items/options", token);
+export async function loadEffectOptions() {
+  return (await load<EffectOption>("item-effects")).filter(
+    (option) => option.is_active,
+  );
 }
 
-export async function loadPresentOptions(token: string) {
+export async function loadItemOptions() {
+  return load<ItemOption>("items/options");
+}
+
+export async function loadPresentOptions() {
   const [items, cards, players] = await Promise.all([
-    load<ItemOption>("items/options", token),
-    load<CardOption>("cards/options", token),
-    load<PlayerOption>("players/options", token),
+    load<ItemOption>("items/options"),
+    load<CardOption>("cards/options"),
+    load<PlayerOption>("players/options"),
   ]);
   return { items, cards, players };
 }
