@@ -1,7 +1,2 @@
-import { loadCardOptions } from "@/lib/admin-master-data";
-import CardForm from "../card-form";
-
-export default async function NewCard() {
-  const options = await loadCardOptions();
-  return <CardForm {...options} />;
-}
+import { CardCreateLoader } from "../components/card-editor-loader";
+export default function NewCardPage() { return <CardCreateLoader/>; }

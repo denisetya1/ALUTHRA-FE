@@ -1,6 +1,2 @@
-import { loadEffectOptions } from "@/lib/admin-master-data";
-import RelicForm from "../relic-form";
-
-export default async function NewRelic() {
-  return <RelicForm effects={await loadEffectOptions()} />;
-}
+import { RelicCreateLoader } from "../components/relic-editor-loader";
+export default function NewRelicPage() { return <RelicCreateLoader/>; }

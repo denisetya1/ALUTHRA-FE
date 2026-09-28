@@ -18,3 +18,14 @@ For UI, copy, people, mobile layout, or code comments work, load the antislop sk
 - Copy & text: `antislop-copywriting`
 Before starting, ask the user when antislop applies: during the work, or after it is done.
 <!-- antislop:end -->
+
+## ALUTHRA-FE architecture
+
+- Use Tailwind CSS utilities for all feature and layout styling. Do not add route-level `.css` files, CSS modules, inline style objects, or new global component classes. Global CSS is limited to Tailwind setup, design tokens, resets, third-party library imports, and genuinely global browser behavior.
+- Use the existing shadcn components in `src/components/ui` before creating a new primitive.
+- Keep `page.tsx` files as thin route wrappers. Put route-specific UI in that route's `components/` directory.
+- Put reusable TanStack Query queries and mutations in `src/hooks`, grouped by domain. Components must not call the backend directly.
+- Put shared Zod schemas in `src/schemas`.
+- Admin authentication belongs in `src/app/admin/layout.tsx`, not in individual pages.
+- Mutations must invalidate every affected query key.
+- Run `npm run lint` and `npm run build` before handing work over.

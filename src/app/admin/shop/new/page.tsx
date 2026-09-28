@@ -1,6 +1,2 @@
-import { loadItemOptions } from "@/lib/admin-master-data";
-import ShopForm from "../shop-form";
-
-export default async function NewShopItem() {
-  return <ShopForm items={await loadItemOptions()} />;
-}
+import ShopEditorLoader from "../components/shop-editor-loader";
+export default function NewShopPage() { return <ShopEditorLoader create />; }

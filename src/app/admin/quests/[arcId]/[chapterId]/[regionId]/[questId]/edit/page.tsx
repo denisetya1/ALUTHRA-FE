@@ -1,4 +1,2 @@
-import { adminFetch } from "@/lib/admin-session";
-import { notFound } from "next/navigation";
-import ContentForm, { emptyContent, type ContentValues } from "../../../../../content-form";
-export default async function EditQuest({params}:{params:Promise<{arcId:string;chapterId:string;regionId:string;questId:string}>}){const{arcId,chapterId,regionId,questId}=await params;if(!/^[a-f\d]{24}$/i.test(questId))notFound();const response=await adminFetch(`/admin/quests/items/${questId}`,{cache:"no-store"});if(response.status===404)notFound();const raw=await response.json() as Partial<ContentValues>&{realms?:string[]};const data={...emptyContent,...raw,realms_text:raw.realms?.join(", ")||""};const back=`/admin/quests/${arcId}/${chapterId}/${regionId}`;return <ContentForm level="quest" mode="edit" endpoint={`/api/admin/quests/items/${questId}`} back={back} initialValues={data}/>;}
+import { QuestEditorLoader } from "../../../../../components/quest-editor-loaders";
+export default function EditQuestPage() { return <QuestEditorLoader/>; }

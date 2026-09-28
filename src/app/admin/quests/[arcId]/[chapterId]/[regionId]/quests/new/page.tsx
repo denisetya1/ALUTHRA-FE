@@ -1,2 +1,2 @@
-import ContentForm, { emptyContent } from "../../../../../content-form";
+import ContentForm, { emptyContent } from "@/app/admin/quests/components/content-form";
 export default async function NewQuest({params}:{params:Promise<{arcId:string;chapterId:string;regionId:string}>}){const{arcId,chapterId,regionId}=await params;const back=`/admin/quests/${arcId}/${chapterId}/${regionId}`;return <ContentForm level="quest" mode="add" endpoint={`/api/admin/quests/regions/${regionId}/quests`} back={back} initialValues={emptyContent}/>;}

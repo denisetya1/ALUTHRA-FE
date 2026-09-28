@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import './theme.css';
-import './shadcn.css';
 import 'react-toastify/dist/ReactToastify.css';
 import ThemeToggle from './theme-toggle';
 import ToastProvider from './toast-provider';
-import QueryProvider from './query-provider';
+import QueryProvider from '@/providers/query-provider';
 
 const outfit = localFont({
   src: [

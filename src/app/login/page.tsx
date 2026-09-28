@@ -3,11 +3,11 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
-import { useManagedMutation } from '@/lib/react-query';
+import { useAdminLogin } from '@/hooks/use-auth';
 
 export default function Login() {
   const router = useRouter();
-  const loginMutation = useManagedMutation();
+  const loginMutation = useAdminLogin();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -16,37 +16,30 @@ export default function Login() {
     if (pending) return;
     setPending(true); setError('');
     const data = new FormData(event.currentTarget);
-    await loginMutation.mutateAsync(async () => { try {
-      const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: data.get('email'), password: data.get('password') }) });
-      if (!response.ok) {
-        const result = await response.json();
-        const message = result.message || 'Unable to sign in. Please try again.';
-        setError(message);
-        toast.error(message);
-        return;
-      }
+    try {
+      await loginMutation.mutateAsync({ email: String(data.get('email') || ''), password: String(data.get('password') || '') });
       toast.success('Signed in successfully.');
       router.replace('/admin'); router.refresh();
-    } catch { const message = 'Unable to connect. Please try again.'; setError(message); toast.error(message); }
-    finally { setPending(false); } });
+    } catch (error) { const message = error instanceof Error ? error.message : 'Unable to connect. Please try again.'; setError(message); toast.error(message); }
+    finally { setPending(false); }
   }
   const isPending = pending || loginMutation.isPending;
-  return <main className="login-shell">
-    <section className="world-panel" aria-label="ALUTHRA">
-      <Link className="brand" href="/"><span className="realm-mark" aria-hidden="true">A</span><span>ALUTHRA</span></Link>
-      <div className="world-art" aria-hidden="true"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="sigil">A</div></div>
-      <div className="world-copy"><p className="eyebrow">War of the Three Realms</p><h1>Every realm.<br/>One command.</h1><p>Manage Aluthra&apos;s live game data from one place.</p></div>
-      <footer>ALUTHRA <span>Administration portal</span></footer>
+  return <main className="grid min-h-svh grid-cols-2 max-[800px]:grid-cols-1">
+    <section className="flex min-h-[800px] flex-col justify-between overflow-hidden bg-muted px-14 py-12 max-[800px]:min-h-[220px] max-[800px]:p-7" aria-label="ALUTHRA">
+      <Link className="flex items-center gap-3 text-[26px] font-bold tracking-[2px] text-foreground max-[800px]:text-[22px]" href="/"><span className="grid size-8 shrink-0 place-items-center rounded-full border border-primary/40 bg-[var(--primary-soft)] text-sm text-primary" aria-hidden="true">A</span><span>ALUTHRA</span></Link>
+      <div className="relative my-4 grid h-[340px] place-items-center max-[800px]:hidden" aria-hidden="true"><div className="absolute size-[280px] rounded-full border border-border"/><div className="absolute size-[220px] rotate-45 border border-border"/><div className="text-[150px] font-semibold text-foreground">A</div></div>
+      <div><p className="text-xs font-semibold text-muted-foreground">War of the Three Realms</p><h1 className="my-5 text-[clamp(2.25rem,4vw,3.5rem)] font-semibold leading-[1.13] tracking-[-1.5px] max-[800px]:my-3 max-[800px]:text-[32px]">Every realm.<br/>One command.</h1><p className="mb-9 text-sm text-muted-foreground max-[800px]:hidden">Manage Aluthra&apos;s live game data from one place.</p></div>
+      <footer className="flex justify-between border-t border-border pt-6 text-[10px] text-muted-foreground max-[800px]:hidden">ALUTHRA <span>Administration portal</span></footer>
     </section>
-    <section className="form-panel"><div className="login-card">
-      <h2>Welcome back.</h2><p className="muted">Sign in to manage the world of Aluthra.</p>
-      <form onSubmit={submit}>
-        <label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="username" placeholder="Your admin email" required maxLength={254} disabled={isPending}/>
-        <label htmlFor="password">Password</label><div className="password-field"><input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Enter your password" required maxLength={128} disabled={isPending}/><button type="button" className="reveal" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? 'Hide' : 'Show'}</button></div>
-        {error && <p className="error" role="alert">{error}</p>}
-        <button className="primary" type="submit" disabled={isPending}>{isPending ? 'Signing in…' : 'Sign in'}</button>
+    <section className="relative flex min-h-[620px] items-center justify-center bg-background px-12 py-[70px] max-[800px]:px-6 max-[800px]:py-11 max-[800px]:pb-24"><div className="w-full max-w-[370px]">
+      <h2 className="mb-3 text-[40px] font-semibold tracking-[-1px]">Welcome back.</h2><p className="text-sm leading-7 text-muted-foreground">Sign in to manage the world of Aluthra.</p>
+      <form className="mt-9" onSubmit={submit}>
+        <label className="mb-2.5 mt-[22px] block text-xs text-foreground" htmlFor="email">Email address</label><input className="h-[50px] w-full rounded-md border border-input bg-background px-3.5 text-foreground outline-none placeholder:text-[13px] placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-muted" id="email" name="email" type="email" autoComplete="username" placeholder="Your admin email" required maxLength={254} disabled={isPending}/>
+        <label className="mb-2.5 mt-[22px] block text-xs text-foreground" htmlFor="password">Password</label><div className="relative"><input className="h-[50px] w-full rounded-md border border-input bg-background px-3.5 pr-16 text-foreground outline-none placeholder:text-[13px] placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-muted" id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Enter your password" required maxLength={128} disabled={isPending}/><button type="button" className="absolute right-3 top-0 h-[50px] border-0 bg-transparent text-xs text-muted-foreground" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? 'Hide' : 'Show'}</button></div>
+        {error && <p className="text-[13px] leading-6 text-destructive" role="alert">{error}</p>}
+        <button className="mt-7 flex min-h-12 w-full items-center justify-center rounded-md bg-primary px-4 font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-wait disabled:opacity-60" type="submit" disabled={isPending}>{isPending ? 'Signing in…' : 'Sign in'}</button>
       </form>
-      <p className="access-note">Access is reserved for authorized administrators.<br/>Contact your administrator if you need an account.</p>
-    </div><p className="form-footer">Aluthra control center <span>© {new Date().getFullYear()} ALUTHRA</span></p></section>
+      <p className="mt-7 text-center text-[11px] leading-5 text-muted-foreground">Access is reserved for authorized administrators.<br/>Contact your administrator if you need an account.</p>
+    </div><p className="absolute bottom-6 left-12 right-12 flex justify-between text-[9px] text-muted-foreground max-[800px]:bottom-16 max-[800px]:left-6 max-[800px]:right-6">Aluthra control center <span>© {new Date().getFullYear()} ALUTHRA</span></p></section>
   </main>;
 }

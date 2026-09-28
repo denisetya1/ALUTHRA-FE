@@ -1,17 +1,2 @@
-import { adminFetch } from "@/lib/admin-session";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowLeft, Pencil, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import "../../../quests.css";
-
-type Region={source_id:string;name_english:string;name_indonesia:string;realms:string[];scope:string};
-type Quest={_id:string;source_id:string;order_number:number;quest_type:string;name_english:string;name_indonesia:string;objective_english:string;energy_cost:number;progress_per_explore:number;requirement:string;reward_notes_english?:string;boss_english?:string;prerequisites:unknown;dialogues:unknown[]};
-
-export default async function QuestList({params,searchParams}:{params:Promise<{arcId:string;chapterId:string;regionId:string}>;searchParams:Promise<{search?:string}>}){
-  const{arcId,chapterId,regionId}=await params;if(![arcId,chapterId,regionId].every(id=>/^[a-f\d]{24}$/i.test(id)))notFound();
-  const search=(await searchParams).search?.slice(0,100)||"";const query=new URLSearchParams({limit:"100",...(search?{search}:{})});
-  const[regionResponse,listResponse]=await Promise.all([adminFetch(`/admin/quests/regions/${regionId}`,{cache:"no-store"}),adminFetch(`/admin/quests/regions/${regionId}/quests?${query}`,{cache:"no-store"})]);if(regionResponse.status===404)notFound();if(!regionResponse.ok||!listResponse.ok)throw new Error("Unable to load quests");
-  const region=await regionResponse.json() as Region;const result=await listResponse.json() as{data:Quest[];total:number};const path=`/admin/quests/${arcId}/${chapterId}/${regionId}`;
-  return <section><Button variant="ghost" size="sm" asChild><Link href={`/admin/quests/${arcId}/${chapterId}`}><ArrowLeft/>Back to regions</Link></Button><div className="hierarchy-heading"><p className="eyebrow">{region.source_id}</p><h1>{region.name_english}</h1><p className="muted">{region.name_indonesia} · {region.realms.join(", ")} · {result.total} quests</p></div><form className="quest-filters"><input name="search" placeholder="Search quest…" defaultValue={search}/><Button type="submit" variant="outline"><Search/>Search</Button></form><div className="quest-table-wrap"><div className="quest-table-scroll"><table className="quest-table"><thead><tr><th>Order</th><th>Quest</th><th>Type</th><th>Energy</th><th>Progress</th><th>Requirement</th><th>Details</th><th>Action</th></tr></thead><tbody>{result.data.length ? result.data.map(quest=><tr key={quest._id}><td>{quest.order_number}</td><td className="quest-name"><small>{quest.source_id}</small><strong>{quest.name_english}</strong><small>{quest.name_indonesia}</small><small>{quest.objective_english}</small></td><td><span className="hierarchy-badge">{quest.quest_type}</span></td><td>{quest.energy_cost}</td><td>{quest.progress_per_explore}</td><td>{quest.requirement}</td><td><details><summary>View</summary><dl><dt>Rewards</dt><dd>{quest.reward_notes_english}</dd><dt>Boss</dt><dd>{quest.boss_english}</dd><dt>Prerequisites</dt><dd>{JSON.stringify(quest.prerequisites)}</dd><dt>Dialogues</dt><dd>{quest.dialogues.length}</dd></dl></details></td><td><Button size="sm" variant="outline" asChild><Link href={`${path}/${quest._id}/edit`}><Pencil/>Edit</Link></Button></td></tr>) : <tr><td colSpan={8} className="quest-empty">{search ? "No quests match this search. Clear the search to view all quests." : "No quests yet. Use Add quest to populate this region."}</td></tr>}</tbody></table></div></div></section>;
-}
+import { QuestsBrowser } from "../../../components/quest-browser";
+export default function QuestsPage() { return <QuestsBrowser/>; }
