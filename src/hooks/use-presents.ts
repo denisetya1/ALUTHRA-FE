@@ -3,13 +3,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { clientApi } from "@/lib/client-api";
 import { useAdminQuery } from "@/hooks/use-admin-query";
+import type { PresentValues } from "@/schemas/present";
 
 export type Present = { _id: string; title: string; status: string; image?: string; player_id?: { username?: string; email?: string }; items?: unknown[]; cards?: unknown[]; gacha?: number; gold?: number; aether?: number };
+export type PresentDetail = Omit<PresentValues, "image_file"> & { _id: string; image?: string };
 
 export const usePresents = () =>
   useAdminQuery<{ data: Present[]; total: number }>(["presents"], "presents");
 export const usePresent = (id: string) =>
-  useAdminQuery<Present>(["present", id], `presents/${id}`, /^[a-f\d]{24}$/i.test(id));
+  useAdminQuery<PresentDetail>(["present", id], `presents/${id}`, /^[a-f\d]{24}$/i.test(id));
 
 export function useSavePresent() {
   const queryClient = useQueryClient();

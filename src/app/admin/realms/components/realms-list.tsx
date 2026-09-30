@@ -20,8 +20,7 @@ export default function RealmsList() {
         <p role="alert" className="text-sm text-destructive">Unable to load realms. Check the backend connection and refresh.</p>
       ) : (
         <div className="overflow-hidden rounded-[10px] border border-border bg-background">
-          <div className="overflow-auto">
-            <Table className="w-full border-collapse text-left text-xs [&_th]:whitespace-nowrap [&_th]:bg-muted [&_th]:font-medium [&_th]:text-muted-foreground [&_th]:p-4 [&_td]:border-b [&_td]:border-border [&_td]:p-4 [&_td]:align-top">
+          <Table>
               <TableCaption className="p-[18px] text-left font-semibold">{result.total} realms</TableCaption>
               <TableHeader><TableRow><TableHead>No</TableHead><TableHead>Mongo ID</TableHead><TableHead>Code</TableHead><TableHead>Name</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
               <TableBody>
@@ -36,7 +35,6 @@ export default function RealmsList() {
                 )) : <TableRow><TableCell colSpan={5} className="p-8 text-center text-muted-foreground">No realms are available. Refresh after the backend seed completes.</TableCell></TableRow>}
               </TableBody>
             </Table>
-          </div>
         </div>
       )}
     </section>

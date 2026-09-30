@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "@/components/ui/select";
+
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -26,21 +28,13 @@ import type {
   RarityOption,
   SkillOption,
   ItemOption,
-} from "@/lib/admin-master-data";
-import { useSaveCard } from "@/hooks/use-cards";
+} from "@/types/admin-options";
+import { useSaveCard, type CardDetail } from "@/hooks/use-cards";
 import { useUpload } from "@/hooks/use-upload";
+import { FormError } from "@/components/admin/page-state";
 
 type ImageVariant = "full" | "default" | "deck" | "thumb";
-export type StoredEvolutionImage = {
-  evolution: number;
-  full: string;
-  default: string;
-  deck: string;
-  thumb: string;
-};
-export type CardDefaults = Omit<CardValues, "evolution_images"> & {
-  images?: StoredEvolutionImage[];
-};
+export type CardDefaults = CardDetail;
 const emptyImages = (count: number): CardValues["evolution_images"] =>
   Array.from({ length: count }, () => ({
     full: undefined,
@@ -297,19 +291,19 @@ export default function CardForm({
                 </div>
                 <div className="grid min-w-0 content-start gap-2">
                   <Label htmlFor="realm">Realm *</Label>
-                  <select id="realm" {...register("realm")}>
+                  <Select id="realm" {...register("realm")}>
                     <option value="">Select realm</option>
                     {realms.map((realm) => (
                       <option key={realm._id} value={realm.code}>
                         {realm.name}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                   {error("realm")}
                 </div>
                 <div className="grid min-w-0 content-start gap-2">
                   <Label htmlFor="rarity">Rarity *</Label>
-                  <select
+                  <Select
                     id="rarity"
                     {...register("rarity", { valueAsNumber: true })}
                   >
@@ -318,7 +312,7 @@ export default function CardForm({
                         {rarity.name}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                   {error("rarity")}
                 </div>
                 <div className="grid min-w-0 content-start gap-2">
@@ -391,7 +385,7 @@ export default function CardForm({
                       <div className="grid grid-cols-[minmax(0,1fr)_minmax(100px,180px)_40px] items-end gap-3 max-[800px]:grid-cols-[minmax(0,1fr)_110px_40px]" key={field.id}>
                         <div className="grid min-w-0 content-start gap-2">
                           <Label htmlFor={`material-${index}`}>Item *</Label>
-                          <select
+                          <Select
                             id={`material-${index}`}
                             {...register(`evolve_materials.${index}.item_id`)}
                           >
@@ -403,7 +397,7 @@ export default function CardForm({
                                   item._id}
                               </option>
                             ))}
-                          </select>
+                          </Select>
                           {errors.evolve_materials?.[index]?.item_id && (
                             <small className="text-sm text-destructive">
                               {errors.evolve_materials[index]?.item_id?.message}
@@ -534,7 +528,7 @@ export default function CardForm({
                                 <Label htmlFor={`skill-evolve-${skill._id}`}>
                                   Active from evolve
                                 </Label>
-                                <select
+                                <Select
                                   id={`skill-evolve-${skill._id}`}
                                   value={selected.min_evolution}
                                   onChange={(event) =>
@@ -560,7 +554,7 @@ export default function CardForm({
                                       </option>
                                     ),
                                   )}
-                                </select>
+                                </Select>
                               </div>
                             )}
                           </div>
@@ -641,11 +635,7 @@ export default function CardForm({
             </CardContent>
           </Card>
         </fieldset>
-        {errors.root && (
-          <p className="text-sm text-destructive" role="alert">
-            {errors.root.message}
-          </p>
-        )}
+        <FormError message={errors.root?.message}/>
         <div className="flex justify-end gap-3 py-6">
           <Button type="button" variant="outline" size="lg" asChild>
             <Link href="/admin/cards">Cancel</Link>

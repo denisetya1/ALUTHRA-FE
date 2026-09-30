@@ -14,7 +14,7 @@ export default function CardSkillsList() {
     <p className="text-xs font-semibold text-muted-foreground">Reference data</p>
     <div className="flex w-full items-center justify-between gap-6 max-[600px]:flex-col max-[600px]:items-start"><div><h1>Card Skills</h1><p className="text-muted-foreground">Battle skills imported from the Varhara master data.</p></div></div>
     {isLoading ? <p role="status">Loading card skills…</p> : isError || !result ? <p role="alert" className="text-sm text-destructive">Unable to load card skills. Check the backend connection and refresh.</p> : (
-      <div className="overflow-hidden rounded-[10px] border border-border bg-background"><div className="overflow-auto"><Table className="w-full border-collapse text-left text-xs [&_th]:whitespace-nowrap [&_th]:bg-muted [&_th]:font-medium [&_th]:text-muted-foreground [&_th]:p-4 [&_td]:border-b [&_td]:border-border [&_td]:p-4 [&_td]:align-top">
+      <Table>
         <TableCaption className="p-[18px] text-left font-semibold">{result.total} card skills · Source: {result.source}</TableCaption>
         <TableHeader><TableRow>{["No", "Mongo ID", "Legacy ID", "Name", "Skill stat", "Target", "Chance", "Attributes", "Effect", "Effect stat", "Rarity", "Status"].map((name) => <TableHead key={name}>{name}</TableHead>)}</TableRow></TableHeader>
         <TableBody>{result.data.length ? result.data.map((skill, index) => <TableRow key={skill._id}>
@@ -26,7 +26,7 @@ export default function CardSkillsList() {
           <TableCell>{statNames[skill.effect_type] || skill.effect_type}</TableCell><TableCell>{skill.rarity}</TableCell>
           <TableCell><span className="inline-flex rounded-full bg-[var(--primary-soft)] px-2 py-1 text-[11px] font-semibold text-[var(--primary-soft-foreground)]">{skill.is_active ? "Active" : "Inactive"}</span></TableCell>
         </TableRow>) : <TableRow><TableCell colSpan={12} className="p-8 text-center text-muted-foreground">No card skills are available. Refresh after the Varhara import completes.</TableCell></TableRow>}</TableBody>
-      </Table></div></div>
+      </Table>
     )}
   </section>;
 }

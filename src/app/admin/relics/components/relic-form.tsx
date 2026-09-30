@@ -1,4 +1,6 @@
 "use client";
+
+import { Select } from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
@@ -18,9 +20,10 @@ import {
 } from "@/components/ui/card";
 import { ArrowLeft, ImagePlus, Loader2, Save } from "lucide-react";
 import { toast } from "react-toastify";
-import type { EffectOption } from "@/lib/admin-master-data";
+import type { EffectOption } from "@/types/admin-options";
 import { useSaveRelic } from "@/hooks/use-relics";
 import { useUpload } from "@/hooks/use-upload";
+import { FormError } from "@/components/admin/page-state";
 export type RelicDefaults = Omit<RelicValues, "image_file"> & {
   image?: string;
 };
@@ -168,14 +171,14 @@ export default function RelicForm({
               <div className="grid grid-cols-2 gap-6 max-[800px]:grid-cols-1">
                 <div className="grid min-w-0 content-start gap-2">
                   <Label htmlFor="effect">Effect *</Label>
-                  <select id="effect" {...register("effect")}>
+                  <Select id="effect" {...register("effect")}>
                     <option value="">Select item effect</option>
                     {effects.map((effect) => (
                       <option key={effect._id} value={effect.name}>
                         {effect.description} ({effect.name})
                       </option>
                     ))}
-                  </select>
+                  </Select>
                   {err("effect")}
                 </div>
                 {(["effect_amount", "price", "discount"] as const).map((n) => (
@@ -212,7 +215,7 @@ export default function RelicForm({
             </CardContent>
           </Card>
         </fieldset>
-        {errors.root && <p className="text-sm text-destructive">{errors.root.message}</p>}
+        <FormError message={errors.root?.message}/>
         <div className="flex justify-end gap-3 py-6">
           <Button type="button" variant="outline" size="lg" asChild>
             <Link href="/admin/relics">Cancel</Link>

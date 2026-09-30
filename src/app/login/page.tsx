@@ -1,4 +1,7 @@
 'use client';
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -34,8 +37,8 @@ export default function Login() {
     <section className="relative flex min-h-[620px] items-center justify-center bg-background px-12 py-[70px] max-[800px]:px-6 max-[800px]:py-11 max-[800px]:pb-24"><div className="w-full max-w-[370px]">
       <h2 className="mb-3 text-[40px] font-semibold tracking-[-1px]">Welcome back.</h2><p className="text-sm leading-7 text-muted-foreground">Sign in to manage the world of Aluthra.</p>
       <form className="mt-9" onSubmit={submit}>
-        <label className="mb-2.5 mt-[22px] block text-xs text-foreground" htmlFor="email">Email address</label><input className="h-[50px] w-full rounded-md border border-input bg-background px-3.5 text-foreground outline-none placeholder:text-[13px] placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-muted" id="email" name="email" type="email" autoComplete="username" placeholder="Your admin email" required maxLength={254} disabled={isPending}/>
-        <label className="mb-2.5 mt-[22px] block text-xs text-foreground" htmlFor="password">Password</label><div className="relative"><input className="h-[50px] w-full rounded-md border border-input bg-background px-3.5 pr-16 text-foreground outline-none placeholder:text-[13px] placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-muted" id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Enter your password" required maxLength={128} disabled={isPending}/><button type="button" className="absolute right-3 top-0 h-[50px] border-0 bg-transparent text-xs text-muted-foreground" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? 'Hide' : 'Show'}</button></div>
+        <Label className="mb-2.5 mt-[22px] block text-xs text-foreground" htmlFor="email">Email address</Label><Input className="h-[50px]" id="email" name="email" type="email" autoComplete="username" placeholder="Your admin email" required maxLength={254} disabled={isPending}/>
+        <Label className="mb-2.5 mt-[22px] block text-xs text-foreground" htmlFor="password">Password</Label><div className="relative"><Input className="h-[50px] pr-16" id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Enter your password" required maxLength={128} disabled={isPending}/><button type="button" className="absolute right-3 top-0 h-[50px] border-0 bg-transparent text-xs text-muted-foreground" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? 'Hide' : 'Show'}</button></div>
         {error && <p className="text-[13px] leading-6 text-destructive" role="alert">{error}</p>}
         <button className="mt-7 flex min-h-12 w-full items-center justify-center rounded-md bg-primary px-4 font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-wait disabled:opacity-60" type="submit" disabled={isPending}>{isPending ? 'Signing in…' : 'Sign in'}</button>
       </form>

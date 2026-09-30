@@ -1,5 +1,9 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
+
+import { Select } from "@/components/ui/select";
+
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from "@/components/ui/table";
 
 import { useSearchParams } from "next/navigation";
@@ -37,17 +41,17 @@ export default function PlayersList() {
       <div className="flex w-full items-center justify-between gap-6 max-[600px]:flex-col max-[600px]:items-start"><div><h1>Players</h1><p className="text-muted-foreground">View player accounts, progression, realm, and account status.</p></div></div>
       {params.get("reset") === "1" && <p role="status">Player data reset successfully.</p>}
       <form className="my-6 flex flex-wrap items-center gap-3">
-        <input name="search" aria-label="Search players" placeholder="Search name, username, or email…" defaultValue={search} />
-        <input name="realm" aria-label="Filter by realm" placeholder="Realm" defaultValue={realm} />
-        <select name="status" aria-label="Account status" defaultValue={status}>
+        <Input name="search" aria-label="Search players" placeholder="Search name, username, or email…" defaultValue={search} />
+        <Input name="realm" aria-label="Filter by realm" placeholder="Realm" defaultValue={realm} />
+        <Select name="status" aria-label="Account status" defaultValue={status}>
           <option value="">All statuses</option><option value="active">Active</option><option value="suspended">Suspended</option><option value="banned">Banned</option>
-        </select>
+        </Select>
         <Button type="submit" variant="outline"><Search />Search</Button>
         <Button type="button" variant="ghost" asChild><Link href="/admin/players"><X />Reset</Link></Button>
       </form>
       {playersQuery.isPending ? <p>Loading players…</p> : playersQuery.isError || !result ? <p role="alert" className="text-sm text-destructive">Unable to load players. Check the backend connection and refresh.</p> : (
         <div className="overflow-hidden rounded-[10px] border border-border bg-background">
-          <div className="overflow-auto"><Table className="w-full border-collapse text-left text-xs [&_th]:whitespace-nowrap [&_th]:bg-muted [&_th]:font-medium [&_th]:text-muted-foreground [&_th]:p-4 [&_td]:border-b [&_td]:border-border [&_td]:p-4 [&_td]:align-top">
+          <Table>
             <TableCaption className="p-[18px] text-left font-semibold">{result.total} players</TableCaption>
             <TableHeader><TableRow>{["No", "Player", "Email", "Realm", "Level", "EXP", "Crown", "Status", "Last login", "Joined", "Action"].map((name) => <TableHead key={name}>{name}</TableHead>)}</TableRow></TableHeader>
             <TableBody>{result.data.length ? result.data.map((player, index) => (
@@ -58,7 +62,7 @@ export default function PlayersList() {
                 <TableCell>{(player.experience ?? 0).toLocaleString()}</TableCell><TableCell>{(player.crown ?? 0).toLocaleString()}</TableCell>
                 <TableCell><span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold capitalize ${player.status === "banned" ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300" : player.status === "suspended" ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" : "bg-[var(--primary-soft)] text-[var(--primary-soft-foreground)]"}`}>{player.status || "active"}</span></TableCell>
                 <TableCell>{formatDate(player.last_login_at)}</TableCell><TableCell>{formatDate(player.createdAt)}</TableCell><TableCell>
-                  <div style={{ display: 'flex', gap: 8 }}>
+                  <div className="flex gap-2">
                     <Button size="sm" variant="ghost" asChild>
                       <Link href={`/admin/players/${player._id}`}>View</Link>
                     </Button>
@@ -67,7 +71,7 @@ export default function PlayersList() {
                 </TableCell>
               </TableRow>
             )) : <TableRow><TableCell colSpan={11} className="p-8 text-center text-muted-foreground">{search || realm || status ? "No players match these filters. Reset the filters to view every player." : "No players have registered yet. New accounts will appear here after registration."}</TableCell></TableRow>}</TableBody>
-          </Table></div>
+          </Table>
           <footer className="flex justify-between gap-4 p-[18px] text-xs text-muted-foreground"><span>Page {page} · {result.total} results</span><div>
             {page > 1 && <Button size="sm" variant="outline" asChild><Link href={pageLink(page - 1)}><ChevronLeft />Previous</Link></Button>}
             {page * 20 < result.total && <Button size="sm" variant="outline" asChild><Link href={pageLink(page + 1)}>Next<ChevronRight /></Link></Button>}

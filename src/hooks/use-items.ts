@@ -6,11 +6,12 @@ import type { ItemFormValues } from "@/schemas/item";
 import { useAdminQuery } from "@/hooks/use-admin-query";
 
 export type Item = { _id: string; name_english?: string; name_indonesia?: string; image?: string; effect?: string; effect_amount?: number; desc_english?: string; desc_indonesia?: string };
+export type ItemDetail = Omit<ItemFormValues, "image_file"> & { _id: string; image?: string };
 
 export const useItems = (query: string) =>
   useAdminQuery<{ data: Item[]; total: number }>(["items", query], `items?${query}`);
 export const useItem = (id: string) =>
-  useAdminQuery<Item>(["item", id], `items/${id}`, /^[a-f\d]{24}$/i.test(id));
+  useAdminQuery<ItemDetail>(["item", id], `items/${id}`, /^[a-f\d]{24}$/i.test(id));
 
 type SaveItemInput = Omit<ItemFormValues, "image_file"> & { id?: string; image: string };
 

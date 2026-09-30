@@ -1,5 +1,7 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
+
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from "@/components/ui/table";
 
 import { useSearchParams } from "next/navigation";
@@ -46,7 +48,7 @@ export default function ItemsList() {
         <p role="status">Item updated successfully.</p>
       )}
       <form className="my-6 flex flex-wrap items-center gap-3">
-        <input
+        <Input
           name="search"
           aria-label="Search item name"
           placeholder="Search item name…"
@@ -69,8 +71,7 @@ export default function ItemsList() {
         </p>
       ) : (
         <div className="overflow-hidden rounded-[10px] border border-border bg-background">
-          <div className="overflow-auto">
-            <Table className="w-full border-collapse text-left text-xs [&_th]:whitespace-nowrap [&_th]:bg-muted [&_th]:font-medium [&_th]:text-muted-foreground [&_th]:p-4 [&_td]:border-b [&_td]:border-border [&_td]:p-4 [&_td]:align-top">
+          <Table>
               <TableCaption className="p-[18px] text-left font-semibold">{result.total} items</TableCaption>
               <TableHeader>
                 <TableRow>
@@ -131,7 +132,6 @@ export default function ItemsList() {
                 )}
               </TableBody>
             </Table>
-          </div>
           <footer className="flex justify-between gap-4 p-[18px] text-xs text-muted-foreground">
             <span>
               Page {page} · {result.total} results

@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "@/components/ui/select";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -11,8 +13,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { gameConfigSchema, type GameConfigValues } from "@/schemas/game-config";
-import type { CardOption } from "@/lib/admin-master-data";
+import type { CardOption } from "@/types/admin-options";
 import { useSaveGameConfig } from "@/hooks/use-game-config";
+import { FormError } from "@/components/admin/page-state";
 
 const STARTING_STAT_FIELDS = [
   ["level", "Level"], ["experience", "EXP"], ["experience_next", "EXP to next level"],
@@ -71,7 +74,7 @@ export default function GameConfigForm({ initialValues, cards }: { initialValues
             <CardContent className="grid grid-cols-2 gap-6 max-[800px]:grid-cols-1">
               {(["solaris", "sylvara", "umbra"] as const).map((realm) => {
                 const field = `first_cards.${realm}` as const;
-                return <div className="grid min-w-0 content-start gap-2" key={realm}><Label htmlFor={field} className="capitalize">{realm} first card *</Label><select id={field} {...register(field)}><option value="">Select {realm} card</option>{cards.filter((card) => card.realm?.toLowerCase() === realm).map((card) => <option key={card._id} value={card._id}>{card.name || card._id}</option>)}</select>{errors.first_cards?.[realm] && <small className="text-sm text-destructive">{errors.first_cards[realm]?.message}</small>}</div>;
+                return <div className="grid min-w-0 content-start gap-2" key={realm}><Label htmlFor={field} className="capitalize">{realm} first card *</Label><Select id={field} {...register(field)}><option value="">Select {realm} card</option>{cards.filter((card) => card.realm?.toLowerCase() === realm).map((card) => <option key={card._id} value={card._id}>{card.name || card._id}</option>)}</Select>{errors.first_cards?.[realm] && <small className="text-sm text-destructive">{errors.first_cards[realm]?.message}</small>}</div>;
               })}
             </CardContent>
           </Card>
@@ -100,7 +103,7 @@ export default function GameConfigForm({ initialValues, cards }: { initialValues
             </CardContent>
           </Card>
         </fieldset>
-        {errors.root && <p className="text-sm text-destructive" role="alert">{errors.root.message}</p>}
+        <FormError message={errors.root?.message}/>
         <div className="flex justify-end gap-3 py-6"><Button type="submit" size="lg" className="min-w-[136px]" disabled={pending}>{pending ? <Loader2 className="animate-spin" /> : <Save />}{pending ? "Saving…" : "Save config"}</Button></div>
       </form>
     </section>

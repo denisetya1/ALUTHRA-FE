@@ -1,7 +1,7 @@
 "use client";
 
 import { useAdminQuery } from "@/hooks/use-admin-query";
-import type { CardOption, ItemOption, PlayerOption } from "@/lib/admin-master-data";
+import type { CardOption, ItemOption, PlayerOption } from "@/types/admin-options";
 
 type ListResult<T> = { data: T[]; total?: number };
 

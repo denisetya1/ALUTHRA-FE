@@ -1,4 +1,6 @@
 "use client";
+
+import { Select } from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -17,9 +19,10 @@ import {
 } from "@/components/ui/card";
 import { ArrowLeft, Loader2, Save, ImagePlus } from "lucide-react";
 import { toast } from "react-toastify";
-import type { EffectOption } from "@/lib/admin-master-data";
+import type { EffectOption } from "@/types/admin-options";
 import { useSaveItem } from "@/hooks/use-items";
 import { useUpload } from "@/hooks/use-upload";
+import { FormError } from "@/components/admin/page-state";
 
 export type ItemDefaults = Omit<ItemFormValues, "image_file"> & {
   image?: string;
@@ -190,7 +193,7 @@ export default function ItemForm({
               <div className="grid grid-cols-2 gap-6 max-[800px]:grid-cols-1">
                 <div className="grid min-w-0 content-start gap-2">
                   <Label htmlFor="effect">Effect *</Label>
-                  <select
+                  <Select
                     id="effect"
                     {...register("effect")}
                     {...accessibility("effect")}
@@ -201,7 +204,7 @@ export default function ItemForm({
                         {effect.description} ({effect.name})
                       </option>
                     ))}
-                  </select>
+                  </Select>
                   {fieldError("effect")}
                 </div>
                 <div className="grid min-w-0 content-start gap-2">
@@ -213,11 +216,7 @@ export default function ItemForm({
             </CardContent>
           </Card>
         </fieldset>
-        {errors.root && (
-          <p className="text-sm text-destructive" role="alert">
-            {errors.root.message}
-          </p>
-        )}
+        <FormError message={errors.root?.message}/>
         <div className="flex justify-end gap-3 py-6">
           <Button type="button" variant="outline" size="lg" asChild>
             <Link href="/admin/items">Cancel</Link>

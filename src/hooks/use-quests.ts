@@ -6,8 +6,8 @@ import { useAdminQuery } from "@/hooks/use-admin-query";
 
 export type QuestArc = { _id: string; source_id: string; order_number: number; name_english: string; name_indonesia: string; description_english: string; chapter_count: number };
 export type QuestChapter = { _id: string; source_id: string; order_number: number; name_english: string; name_indonesia: string; description_english: string; convergence_stage: string; region_count: number };
-export type QuestRegion = { _id: string; source_id: string; order_number: number; name_english: string; name_indonesia: string; description_english: string; scope: string; realms: string[]; requirement: string; show: boolean; quest_count: number };
-export type QuestItem = { _id: string; source_id: string; order_number: number; quest_type: string; name_english: string; name_indonesia: string; objective_english: string; energy_cost: number; progress_per_explore: number; requirement: string; reward_notes_english?: string; boss_english?: string; prerequisites: unknown; dialogues: unknown[] };
+export type QuestRegion = { _id: string; source_id: string; order_number: number; name_english: string; name_indonesia: string; description_english: string; description_indonesia?: string; scope: string; realms: string[]; requirement: string; image?: string; show: boolean; quest_count: number };
+export type QuestItem = { _id: string; source_id: string; order_number: number; quest_type: string; name_english: string; name_indonesia: string; objective_english: string; objective_indonesia?: string; energy_cost: number; progress_per_explore: number; requirement: string; scope?: string; realms?: string[]; reward_notes_english?: string; reward_notes_indonesia?: string; boss_english?: string; boss_indonesia?: string; boss_mechanics_english?: string; boss_mechanics_indonesia?: string; prerequisites: unknown; dialogues: unknown[] };
 
 const valid = (id: string) => /^[a-f\d]{24}$/i.test(id);
 export const useQuestArcs = () => useAdminQuery<{ data: QuestArc[]; total: number }>(["quests", "arcs"], "quests/arcs");

@@ -46,7 +46,7 @@ export default function PlayerProfile() {
         </div>
       </div>
 
-      <h2 style={{ marginTop: 32, marginBottom: 16 }}>Owned Cards ({cardsResult?.total || 0})</h2>
+      <h2 className="mb-4 mt-8">Owned Cards ({cardsResult?.total || 0})</h2>
 
       {!cardsResult ? (
         <p className="text-sm text-destructive">Unable to load player cards.</p>
@@ -54,8 +54,7 @@ export default function PlayerProfile() {
         <p className="text-muted-foreground">This player has no cards yet.</p>
       ) : (
         <div className="overflow-hidden rounded-[10px] border border-border bg-background">
-          <div className="overflow-auto">
-            <Table className="w-full border-collapse text-left text-xs [&_th]:whitespace-nowrap [&_th]:bg-muted [&_th]:font-medium [&_th]:text-muted-foreground [&_th]:p-4 [&_td]:border-b [&_td]:border-border [&_td]:p-4 [&_td]:align-top">
+          <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Card</TableHead>
@@ -92,7 +91,6 @@ export default function PlayerProfile() {
                 ))}
               </TableBody>
             </Table>
-          </div>
         </div>
       )}
     </section>
