@@ -26,7 +26,7 @@ import {
 const worldMenus = [
   { name: "Quests", icon: ScrollText }, { name: "Cards", icon: PanelsTopLeft },
   { name: "Items", icon: Package }, { name: "Relics", icon: Shield },
-  { name: "Events", icon: CalendarDays, comingSoon: true }, { name: "News", icon: Newspaper, comingSoon: true },
+  { name: "Events", icon: CalendarDays }, { name: "News", icon: Newspaper, comingSoon: true },
   { name: "Players", icon: Users }, { name: "Game Config", icon: Settings },
   { name: "Shop", icon: ShoppingBag },
   { name: "Presents", icon: Gift },

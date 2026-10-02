@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  if (request.headers.get('origin') !== request.nextUrl.origin) return NextResponse.json({ message: 'Invalid origin' }, { status: 403 });
+  const origin = request.headers.get('origin');
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
+  try {
+    if (!origin || !host || new URL(origin).host !== host) {
+      return NextResponse.json({ message: 'Invalid origin' }, { status: 403 });
+    }
+  } catch {
+    return NextResponse.json({ message: 'Invalid origin' }, { status: 403 });
+  }
   let body: { email?: unknown; password?: unknown };
   try { body = await request.json(); } catch { return NextResponse.json({ message: 'Invalid request' }, { status: 400 }); }
   if (!body || typeof body.email !== 'string' || typeof body.password !== 'string' || body.email.length > 254 || body.password.length > 128) return NextResponse.json({ message: 'Enter a valid email and password.' }, { status: 400 });
